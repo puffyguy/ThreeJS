@@ -6,37 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3D CPU</title>
 
-    <script>
-      function onRam(obj){
-        alert("View RAM")
-        console.log("RAM");
-        return false
-      }
+    <script type="module" src="./main.js"></script>
 
-      function onSpms(obj){
-        alert('View SMPS')
-        console.log("SMPS");
-        return false
-      }
-
-      function onSsd(obj){
-        alert('View SSD')
-        console.log("SSD");
-        return false
-      }
-    </script>
   </head>
   <body>
     <div class="container">
-      <div class="left">
-        <ul>
-          <li><a href="https://www.google.com" id="ram" onclick="onRam(this); return false;">RAM</a></li>
-          <li><a href="#" id="smps" onclick="onSpms(this); return false;">SMPS</a></li>
-          <li><a href="#" id="ssd" onclick="onSsd(this); return false;">SSD</a></li>
-        </ul>
-      </div>
       <canvas id="renderCanvas"></canvas>
+      <div id="gui"></div>
     </div>
-    <script type="module" src="/main.js"></script>
   </body>
 </html>

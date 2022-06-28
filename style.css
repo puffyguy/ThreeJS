@@ -10,37 +10,10 @@ html, body {
 #renderCanvas{
   width: calc(100% - 30%);
   display: block;
-  margin: 20px auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  /* margin: 20px auto; */
   outline: none;
-}
-
-.left{
-  float: left;
-  width: calc(100% - 70%);
-  height: auto;
-}
-
-ul{
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #333fff;
-}
-
-li{
-  float: left;
-  display: block;
-}
-
-li a{
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  text-decoration: none;
-}
-
-li a:hover{
-  background-color: chartreuse;
 }
