@@ -3,11 +3,12 @@ import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { Pane } from "tweakpane"
+
 //Get canvas
 const canvas = document.querySelector("#renderCanvas")
 
 //GUI Tweakpane
-const pane = new Pane()
+// const pane = new Pane()
 
 const createCamera = () => {
   //Aspect Ration is the width of the render divided by height of render
@@ -23,14 +24,17 @@ const createCamera = () => {
     0.1,
     1000
   )
-  camera.position.set(0, 1.2, 4)
+  camera.position.set(0, 2, 5)
 
-  //Rendere
+  //Rendrer
   const rendrer = new THREE.WebGLRenderer({
     canvas: canvas,
+    antialias: true,
   })
   rendrer.setPixelRatio(window.devicePixelRatio)
   rendrer.setSize(aspectRatio.width, aspectRatio.height)
+  rendrer.outputEncoding = THREE.sRGBEncoding
+  rendrer.shadowMap.enabled = true
 
   return [camera, aspectRatio, rendrer]
 }
@@ -41,12 +45,8 @@ const [camera, aspectRatio, rendrer] = createCamera()
 const createScene = () => {
   //Scene
   const scene = new THREE.Scene()
-  scene.background = new THREE.Color(0xC0C0C0)
-
-  // const params = {
-  //   camera: {x: 0, y: 0, z: 0}
-  // }
-  // pane.addInput(camera.position, "x",{min: -3, max: 3, step: 0.1})
+  scene.background = new THREE.Color(0xc0c0c0)
+  scene.fog = new THREE.Fog(0x72645b, 2, 15)
   scene.add(camera)
 
   //Lights
@@ -71,9 +71,21 @@ const createScene = () => {
 //call createScene
 const [scene] = createScene()
 
+//Loader
+const progressBar = document.getElementById('progress-bar')
+const progressBarContainer = document.querySelector('.progress-bar-container')
+const loadingManager = new THREE.LoadingManager()
+loadingManager.onProgress = (url, loaded, total) => {
+  // console.log(`Started loading: ${url}`);
+  progressBar.value = (loaded /total) * 100
+}
+loadingManager.onLoad = () => {
+  progressBarContainer.style.display = 'none'
+}
+
 //Model
 let cpu = THREE.Object3D
-const loader = new GLTFLoader()
+const loader = new GLTFLoader(loadingManager)
 function loadCPU() {
   loader.load(
     "./assets/BasicCPU.glb",
@@ -112,58 +124,64 @@ function onClick(event) {
   console.log(intersects)
   if (intersects.length > 0) {
     let cpuPart = intersects[0].object
-    console.log(cpuPart)
-    if (cpuPart.name === "Front_Panel") {
-      console.log(cpuPart.name)
-      cpuPart.position.set(2, 1, 1)
+    // console.log(cpuPart)
+    switch (cpuPart.name) {
+      case "Front_Panel":
+        console.log(cpuPart.name)
+        cpuPart.position.set(2, 1, 1)
+        break
+      case "HDD_Tray":
+        console.log(cpuPart.name)
+        cpuPart.position.set(-2, 1, -1)
+        break
+      // case "Lower_Compartment":
+      //   console.log(cpuPart.name)
+      //   cpuPart.position.set(4, 1, -1)
+      //   break
+      case "Side_Panel":
+        console.log(cpuPart.name)
+        cpuPart.position.set(-4, 1, -1)
+        break
     }
-    if (cpuPart.name === "HDD_Tray") {
-      console.log(cpuPart.name)
-      cpuPart.position.set(-2, 1, -1)
-    }
-    if (cpuPart.name === "Lower_Compartment") {
-      console.log(cpuPart.name)
-      cpuPart.position.set(4, 1, -1)
-    }
-    if (cpuPart.name === "Side_Panel") {
-      console.log(cpuPart.name)
-      cpuPart.position.set(-4, 1, -1)
-    }
-    if (cpuPart.parent.name === "SMPS") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(-3, 1, -1)
-    }
-    if (cpuPart.parent.name === "CPU_air_Cooler") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(3, 1, -0.8)
-    }
-    if (cpuPart.parent.name === "Motherboard") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(-3, 1, 2)
-    }
-    if (cpuPart.parent.name === "Intel_Actual_Chip") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(-2, 1, 2)
-    }
-    if (cpuPart.parent.name === "RAM_4") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(3.5, 1, 1)
-    }
-    if (cpuPart.parent.name === "RAM_3") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(3.3, 1, 1.2)
-    }
-    if (cpuPart.parent.name === "RAM_2") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(3.1, 1, 1.4)
-    }
-    if (cpuPart.parent.name === "RAM_1") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(2.9, 1, 1.6)
-    }
-    if (cpuPart.parent.name === "Fan__back") {
-      console.log(cpuPart.parent.name)
-      cpuPart.parent.position.set(1.8, 1, 2)
+
+    switch (cpuPart.parent.name) {
+      case "SMPS":
+        console.log(cpuPart.parent.name)
+        //updating position from -3, 1, -1 to 4, 1, -1
+        cpuPart.parent.position.set(4, 1, -1)
+        break
+      case "CPU_air_Cooler":
+        console.log(cpuPart.parent.name)
+        cpuPart.parent.position.set(3, 1, -0.8)
+        break
+      case "Motherboard":
+        console.log(cpuPart.parent.name)
+        cpuPart.parent.position.set(-3, 1, 2)
+        break
+      case "Intel_Actual_Chip":
+        console.log(cpuPart.parent.name)
+        cpuPart.parent.position.set(-2, 1, 2)
+        break
+      case "RAM_4":
+        console.log(cpuPart.parent.name)
+        cpuPart.parent.position.set(3.5, 1, 1)
+        break
+      case "RAM_3":
+        console.log(cpuPart.parent.name)
+        cpuPart.parent.position.set(3.3, 1, 1.2)
+        break
+      case "RAM_2":
+        console.log(cpuPart.parent.name)
+        cpuPart.parent.position.set(3.1, 1, 1.4)
+        break
+      case "RAM_1":
+        console.log(cpuPart.parent.name)
+        cpuPart.parent.position.set(2.9, 1, 1.6)
+        break
+      case "Fan__back":
+        console.log(cpuPart.parent.name)
+        cpuPart.parent.position.set(1.8, 1, 2)
+        break
     }
   }
 }
@@ -182,7 +200,7 @@ window.addEventListener("resize", () => {
   rendrer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
-//Toggle Fullscreen on mouse double click
+//Toggle Fullscreen on mouse double clickf
 window.addEventListener("dblclick", () => {
   if (!document.fullscreenElement) {
     canvas.requestFullscreen()
@@ -198,13 +216,7 @@ controls.enableDamping = true
 const clock = new THREE.Clock()
 //Animate
 const animate = () => {
-  window.requestAnimationFrame(animate)
-
-  const elapsedTime = clock.getElapsedTime()
-  //Update objects
-  // camera.lookAt()
-  // camera.position.y = Math.sin(elapsedTime)
-  // camera.position.x = Math.cos(elapsedTime)
+  requestAnimationFrame(animate)
 
   //Update controls
   controls.update()
